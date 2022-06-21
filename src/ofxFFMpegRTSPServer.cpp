@@ -5,11 +5,11 @@
 //  Created by Nick Hardeman on 3/30/22.
 //
 
-#include "ofxFFMpegRTSPServer.h"
-#include "ofxFFMpegRTSPUtils.h"
+#include "ofxFFmpegRTSPServer.h"
+#include "ofxFFmpegRTSPUtils.h"
 
 //--------------------------------------------------------------
-ofxFFMpegRTSPServer::ofxFFMpegRTSPServer() {
+ofxFFmpegRTSPServer::ofxFFmpegRTSPServer() {
     mStreamSettings.options["f"] = "rtsp";
     mStreamSettings.options["rtsp_transport"] ="tcp";
     mStreamSettings.options["tune"] = "zerolatency";
@@ -20,13 +20,13 @@ ofxFFMpegRTSPServer::ofxFFMpegRTSPServer() {
 }
 
 //--------------------------------------------------------------
-ofxFFMpegRTSPServer::~ofxFFMpegRTSPServer() {
+ofxFFmpegRTSPServer::~ofxFFmpegRTSPServer() {
     clear();
 }
 
 //--------------------------------------------------------------
-bool ofxFFMpegRTSPServer::configure(const ofPixels& apix) {
-    mInputPixFormat = ofxFFMpegRTSPUtils::getAvPixelFormat(apix);
+bool ofxFFmpegRTSPServer::configure(const ofPixels& apix) {
+    mInputPixFormat = ofxFFmpegRTSPUtils::getAvPixelFormat(apix);
     if (mInputPixFormat == AV_PIX_FMT_NONE) {
         return false;
     }
@@ -44,7 +44,7 @@ bool ofxFFMpegRTSPServer::configure(const ofPixels& apix) {
 }
 
 //--------------------------------------------------------------
-bool ofxFFMpegRTSPServer::init(string apath, int awidth, int aheight ) {
+bool ofxFFmpegRTSPServer::init(string apath, int awidth, int aheight ) {
     if( !bInited ) {
         avformat_network_init();
     }
@@ -137,7 +137,7 @@ bool ofxFFMpegRTSPServer::init(string apath, int awidth, int aheight ) {
 }
 
 //--------------------------------------------------------------
-bool ofxFFMpegRTSPServer::addFrame( const ofPixels& apix ) {
+bool ofxFFmpegRTSPServer::addFrame( const ofPixels& apix ) {
     if (apix.getWidth() > 0 && apix.getHeight() > 0) {
         if (apix.getWidth() != mWidth || apix.getHeight() != mHeight) {
             ofLogError("ofxFFMpegRTSPServer :: addFrame : pixels are different size than width or height ");
@@ -164,7 +164,7 @@ bool ofxFFMpegRTSPServer::addFrame( const ofPixels& apix ) {
 }
 
 //--------------------------------------------------------------
-void ofxFFMpegRTSPServer::clear() {
+void ofxFFmpegRTSPServer::clear() {
     bSendFrame = false;
     bReceivedPixels = false;
     if( isThreadRunning() ) {
@@ -199,7 +199,7 @@ void ofxFFMpegRTSPServer::clear() {
 }
 
 //--------------------------------------------------------------
-void ofxFFMpegRTSPServer::threadedFunction() {
+void ofxFFmpegRTSPServer::threadedFunction() {
     while( isThreadRunning() ) {
         if(bSetup) {
             if(bReceivedPixels) {
@@ -229,7 +229,7 @@ void ofxFFMpegRTSPServer::threadedFunction() {
 
 /* Add an output stream. */
 //--------------------------------------------------------------
-bool ofxFFMpegRTSPServer::add_stream(shared_ptr<OutputStream> ost, AVFormatContext *oc,
+bool ofxFFmpegRTSPServer::add_stream(shared_ptr<OutputStream> ost, AVFormatContext *oc,
                        const AVCodec **codec,
                        enum AVCodecID codec_id) {
     AVCodecContext *c;
@@ -345,7 +345,7 @@ bool ofxFFMpegRTSPServer::add_stream(shared_ptr<OutputStream> ost, AVFormatConte
 /**************************************************************/
 /* video output */
 
-AVFrame* ofxFFMpegRTSPServer::alloc_picture(enum AVPixelFormat pix_fmt, int width, int height) {
+AVFrame* ofxFFmpegRTSPServer::alloc_picture(enum AVPixelFormat pix_fmt, int width, int height) {
     AVFrame *picture;
     int ret;
     
@@ -368,7 +368,7 @@ AVFrame* ofxFFMpegRTSPServer::alloc_picture(enum AVPixelFormat pix_fmt, int widt
 }
 
 //--------------------------------------------------------------
-bool ofxFFMpegRTSPServer::open_video(AVFormatContext *oc, const AVCodec *codec,
+bool ofxFFmpegRTSPServer::open_video(AVFormatContext *oc, const AVCodec *codec,
                        shared_ptr<OutputStream> ost, AVDictionary *opt_arg) {
     int ret;
     AVCodecContext *c = ost->enc;
@@ -432,12 +432,12 @@ void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt) {
  * return 1 when encoding is finished, 0 otherwise
  */
 //--------------------------------------------------------------
-int ofxFFMpegRTSPServer::write_video_frame(AVFormatContext *oc, shared_ptr<OutputStream> ost) {
+int ofxFFmpegRTSPServer::write_video_frame(AVFormatContext *oc, shared_ptr<OutputStream> ost) {
     return write_frame(oc, ost->enc, ost->st, get_video_frame(ost), ost->tmp_pkt);
 }
 
 //--------------------------------------------------------------
-int ofxFFMpegRTSPServer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c,
+int ofxFFmpegRTSPServer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c,
                        AVStream *st, AVFrame *frame, AVPacket *pkt) {
     int ret;
     
@@ -484,7 +484,7 @@ int ofxFFMpegRTSPServer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c
 }
 
 //--------------------------------------------------------------
-AVFrame* ofxFFMpegRTSPServer::get_video_frame(shared_ptr<OutputStream> ost) {
+AVFrame* ofxFFmpegRTSPServer::get_video_frame(shared_ptr<OutputStream> ost) {
     AVCodecContext *c = ost->enc;
     
     /* check if we want to generate more frames */
@@ -557,7 +557,7 @@ AVFrame* ofxFFMpegRTSPServer::get_video_frame(shared_ptr<OutputStream> ost) {
 }
 
 //--------------------------------------------------------------
-void ofxFFMpegRTSPServer::close_stream(AVFormatContext *oc, shared_ptr<OutputStream> ost) {
+void ofxFFmpegRTSPServer::close_stream(AVFormatContext *oc, shared_ptr<OutputStream> ost) {
     avcodec_free_context(&ost->enc);
     av_frame_free(&ost->frame);
     av_frame_free(&ost->tmp_frame);

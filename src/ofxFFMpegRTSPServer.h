@@ -1,13 +1,8 @@
 //
-//  ofxFFMpegRTSP.h
-//  OpenCVRTSP
+//  ofxFFmpegRTSP.h
 //
-//  Created by Nick Hardeman on 3/30/22.
+//  Created by Nick Hardeman.
 //
-
-// https://github.com/developer0hye/RTSP-Client-FFMPEG-OpenCV-ON-QT/blob/master/ffmpegdecoder.cpp
-
-// https://github.com/FFmpeg/FFmpeg/blob/master/doc/examples/demuxing_decoding.c
 
 #pragma once
 #include "ofMain.h"
@@ -48,27 +43,6 @@ extern "C"
     #include "libswresample/swresample.h"
 #endif
 
-#if defined(_WIN32)
-    #ifdef av_err2str
-        #undef av_err2str
-
-        #define av_err2str(errnum) \
-        av_make_error_string(reinterpret_cast<char*>(_alloca(AV_ERROR_MAX_STRING_SIZE)),\
-        AV_ERROR_MAX_STRING_SIZE, errnum)
-    #endif
-#endif
-
-#if defined(TARGET_LINUX)
-    #ifdef av_err2str
-        #undef av_err2str
-        av_always_inline std::string av_err2string(int errnum) {
-    		char str[AV_ERROR_MAX_STRING_SIZE];
-    		return av_make_error_string(str, AV_ERROR_MAX_STRING_SIZE, errnum);
-	}
-	#define av_err2str(err) av_err2string(err).c_str()
-    #endif
-#endif
-
 }
 
 
@@ -81,8 +55,7 @@ extern "C"
 //#define IN_PIX_FMT    AV_PIX_FMT_RGB24 
 #define SCALE_FLAGS SWS_BICUBIC
 
-// https://github.com/FFmpeg/FFmpeg/blob/master/doc/examples/muxing.c
-class ofxFFMpegRTSPServer : public ofThread {
+class ofxFFmpegRTSPServer : public ofThread {
 public:
     
     // a wrapper around a single output AVStream
@@ -114,8 +87,8 @@ public:
         int streamId = -1;
     } StreamSettings;
     
-    ofxFFMpegRTSPServer();
-    ~ofxFFMpegRTSPServer();
+    ofxFFmpegRTSPServer();
+    ~ofxFFmpegRTSPServer();
 
     StreamSettings& getStreamSettings() { return mStreamSettings; }
     

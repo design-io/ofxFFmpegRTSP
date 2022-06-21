@@ -1,13 +1,12 @@
 //
-//  ofxFFMpegRTSP.h
-//  OpenCVRTSP
+//  ofxFFmpegRTSPUtils.h
 //
-//  Created by Nick Hardeman on 3/30/22.
+//  Created by Nick Hardeman.
 //
-#include "ofxFFMpegRTSPUtils.h"
+#include "ofxFFmpegRTSPUtils.h"
 
 //--------------------------------------------------------------
-AVPixelFormat ofxFFMpegRTSPUtils::getAvPixelFormat(const ofPixels& apix) {
+AVPixelFormat ofxFFmpegRTSPUtils::getAvPixelFormat(const ofPixels& apix) {
     auto offmt = apix.getPixelFormat();
     if (offmt == OF_PIXELS_RGB) {
         return AV_PIX_FMT_RGB24;
@@ -22,7 +21,7 @@ AVPixelFormat ofxFFMpegRTSPUtils::getAvPixelFormat(const ofPixels& apix) {
 }
 
 //--------------------------------------------------------------
-ofPixelFormat ofxFFMpegRTSPUtils::getOFPixelFormat(const AVPixelFormat& afmt) {
+ofPixelFormat ofxFFmpegRTSPUtils::getOFPixelFormat(const AVPixelFormat& afmt) {
     // now lets figure out how to convert to a more readable format //
     if (afmt == AV_PIX_FMT_YUV420P) {
         return OF_PIXELS_RGB;

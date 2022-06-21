@@ -1,27 +1,26 @@
 //
 //  ofxFFMpegRTSP.cpp
-//  OpenCVRTSP
 //
-//  Created by Nick Hardeman on 3/30/22.
+//  Created by Nick Hardeman.
 //
 
-#include "ofxFFMpegRTSPClient.h"
-#include "ofxFFMpegRTSPUtils.h"
+#include "ofxFFmpegRTSPClient.h"
+#include "ofxFFmpegRTSPUtils.h"
 
 //--------------------------------------------------------------
-ofxFFMpegRTSPClient::ofxFFMpegRTSPClient() {
+ofxFFmpegRTSPClient::ofxFFmpegRTSPClient() {
     mStreamSettings.options["rtsp_transport"] = "tcp";
     mStreamSettings.options["max_delay"] = "100";
     mStreamSettings.options["stimeout"] = "5000";
 }
 
 //--------------------------------------------------------------
-ofxFFMpegRTSPClient::~ofxFFMpegRTSPClient() {
+ofxFFmpegRTSPClient::~ofxFFmpegRTSPClient() {
     clear();
 }
 
 //--------------------------------------------------------------
-bool ofxFFMpegRTSPClient::connect( string aAddress ) {
+bool ofxFFmpegRTSPClient::connect( string aAddress ) {
     clear();
     
     mPath = aAddress;
@@ -275,12 +274,12 @@ bool ofxFFMpegRTSPClient::connect( string aAddress ) {
 }
 
 //--------------------------------------------------------------
-bool ofxFFMpegRTSPClient::isConnected() {
+bool ofxFFmpegRTSPClient::isConnected() {
     return mBConnected;
 }
 
 //--------------------------------------------------------------
-void ofxFFMpegRTSPClient::update() {
+void ofxFFmpegRTSPClient::update() {
     float delta = ofClamp(ofGetLastFrameTime(), 1.f/1000.f, 1.f/5.f);
     bNewFrame = false;
     if( lock() ) {
@@ -319,7 +318,7 @@ void ofxFFMpegRTSPClient::update() {
 }
 
 //--------------------------------------------------------------
-void ofxFFMpegRTSPClient::clear() {
+void ofxFFmpegRTSPClient::clear() {
     mBConnected = false;
 
     if( isThreadRunning() ) {
@@ -359,7 +358,7 @@ void ofxFFMpegRTSPClient::clear() {
 }
 
 //--------------------------------------------------------------
-void ofxFFMpegRTSPClient::setTextureTarget( int aTexTarget ) {
+void ofxFFmpegRTSPClient::setTextureTarget( int aTexTarget ) {
     if( mTexture.isAllocated() ) {
         if( mTexture.texData.textureTarget != aTexTarget ) {
             mTexture.clear();
@@ -369,7 +368,7 @@ void ofxFFMpegRTSPClient::setTextureTarget( int aTexTarget ) {
 }
 
 //--------------------------------------------------------------
-void ofxFFMpegRTSPClient::threadedFunction() {
+void ofxFFmpegRTSPClient::threadedFunction() {
     while( isThreadRunning() ) {
         if( isConnected() ) {
             _decode();
@@ -381,7 +380,7 @@ void ofxFFMpegRTSPClient::threadedFunction() {
 }
 
 //--------------------------------------------------------------
-void ofxFFMpegRTSPClient::_decode() {
+void ofxFFmpegRTSPClient::_decode() {
 //    std::chrono::milliseconds duration(5);
     
     while (av_read_frame(pFormatCtx, packet) >= 0) {
@@ -417,7 +416,7 @@ void ofxFFMpegRTSPClient::_decode() {
 }
 
 //--------------------------------------------------------------
-int ofxFFMpegRTSPClient::_decodePacket( AVCodecContext* adec, const AVPacket* apkt) {
+int ofxFFmpegRTSPClient::_decodePacket( AVCodecContext* adec, const AVPacket* apkt) {
     
     if( !mBConnected ) {
         return -1;
@@ -483,7 +482,7 @@ int ofxFFMpegRTSPClient::_decodePacket( AVCodecContext* adec, const AVPacket* ap
                 }
                 
                 if( !mVideoPixelsThread.isAllocated() || mVideoPixelsThread.getWidth() != mWidth || mVideoPixelsThread.getHeight() != mHeight ) {
-                    auto ofpixfmt = ofxFFMpegRTSPUtils::getOFPixelFormat(mOutPixFormat);
+                    auto ofpixfmt = ofxFFmpegRTSPUtils::getOFPixelFormat(mOutPixFormat);
                     if (ofpixfmt != OF_PIXELS_UNKNOWN) {
                         mVideoPixelsThread.allocate(mWidth, mHeight, ofpixfmt);
                     } else {
