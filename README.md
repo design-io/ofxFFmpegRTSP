@@ -1,5 +1,5 @@
 # ofxFFmpegRTSP
-Wrapper for ffmpeg and rtsp stream server and client.
+Wrapper for ffmpeg and rtsp stream server and client. Tested with OF v.11.2 on OSX, Windows 10 and Ubuntu 20.04.
 
 A rtsp server is needed. 
 rtsp-simpler-server is a good option. We have tested with v0.19.1. Download the binary for your file system from
