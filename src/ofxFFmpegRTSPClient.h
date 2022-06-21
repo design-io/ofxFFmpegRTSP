@@ -9,11 +9,11 @@
 // https://github.com/FFmpeg/FFmpeg/blob/master/doc/examples/demuxing_decoding.c
 
 #pragma once
-#include "ofMain.h"
+#include "ofxFFmpegRTSPUtils.h"
 
 extern "C"
 {
-#if defined(_WIN32)
+#if defined(OFX_FFMPEG_RTSP_FROM_SOURCE) && !defined(TARGET_LINUX)
     #include "libavutil/avutil.h"
     #include "libavutil/mathematics.h"
     #include "libavutil/imgutils.h"
@@ -21,7 +21,7 @@ extern "C"
     #include "libavutil/pixdesc.h"
     #include "libavdevice/avdevice.h"
     #include "libavcodec/avcodec.h"
-#elif defined(TARGET_LINUX)
+#else
     #include <libavutil/avutil.h>
     #include <libavutil/mathematics.h>
     #include <libavutil/imgutils.h>
@@ -29,18 +29,9 @@ extern "C"
     #include <libavutil/pixdesc.h>
     #include <libavdevice/avdevice.h>
     #include <libavcodec/avcodec.h>
-#else
-    #include "libavutil/mathematics.h"
-    #include "libavutil/imgutils.h"
-    #include "libswscale/swscale.h"
-    #include "libavutil/pixdesc.h"
-    #include "libavdevice/avdevice.h"
-    #include "libavcodec/avcodec.h"
 #endif
 
 }
-
-
 
 class ofxFFmpegRTSPClient : public ofThread {
 public:

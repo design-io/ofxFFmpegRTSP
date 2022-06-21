@@ -5,12 +5,12 @@
 //
 
 #pragma once
-#include "ofMain.h"
+#include "ofxFFmpegRTSPUtils.h"
 
 extern "C"
 {
 
-#if defined(_WIN32)
+#if defined(OFX_FFMPEG_RTSP_FROM_SOURCE) && !defined(TARGET_LINUX)
     #include "libavutil/avassert.h"
     #include "libavutil/channel_layout.h"
     #include "libavutil/opt.h"
@@ -20,8 +20,8 @@ extern "C"
     #include "libavformat/avformat.h"
     #include "libswscale/swscale.h"
     #include "libswresample/swresample.h"
-#elif defined(TARGET_LINUX)
-	#include <libavutil/avutil.h>
+#else
+    #include <libavutil/avutil.h>
     #include <libavutil/avassert.h>
     #include <libavutil/channel_layout.h>
     #include <libavutil/opt.h>
@@ -31,16 +31,6 @@ extern "C"
     #include <libavformat/avformat.h>
     #include <libswscale/swscale.h>
     #include <libswresample/swresample.h>
-#else
-    #include "libavutil/avassert.h"
-    #include "libavutil/channel_layout.h"
-    #include "libavutil/opt.h"
-    #include "libavutil/mathematics.h"
-    #include "libavutil/timestamp.h"
-    #include "libavcodec/avcodec.h"
-    #include "libavformat/avformat.h"
-    #include "libswscale/swscale.h"
-    #include "libswresample/swresample.h"
 #endif
 
 }

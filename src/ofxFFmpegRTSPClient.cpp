@@ -5,7 +5,7 @@
 //
 
 #include "ofxFFmpegRTSPClient.h"
-#include "ofxFFmpegRTSPUtils.h"
+//#include "ofxFFmpegRTSPUtils.h"
 
 //--------------------------------------------------------------
 ofxFFmpegRTSPClient::ofxFFmpegRTSPClient() {

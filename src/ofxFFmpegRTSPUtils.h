@@ -7,17 +7,17 @@
 #pragma once
 #include "ofMain.h"
 
+// comment this out to load ffmpeg from system level 
+#define OFX_FFMPEG_RTSP_FROM_SOURCE
+
 extern "C"
 {
-#if defined(_WIN32)
+#if defined(OFX_FFMPEG_RTSP_FROM_SOURCE) && !defined(TARGET_LINUX)
     #include "libavcodec/avcodec.h"
     #include "libavformat/avformat.h"
-#elif defined(TARGET_LINUX)
+#else
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
-#else
-    #include "libavcodec/avcodec.h"
-    #include "libavformat/avformat.h"
 #endif
 
 #if defined(_WIN32)
