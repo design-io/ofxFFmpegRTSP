@@ -1,13 +1,16 @@
 # ofxFFmpegRTSP
-Wrapper for ffmpeg and rtsp stream server and client.
+Wrapper for ffmpeg and rtsp stream server and client. Tested with OF v.11.2 on OSX, Windows 10 and Ubuntu 20.04.
+Currently audio is not supported.
 
 A rtsp server is needed. 
-rtsp-simpler-server is a good option. We have tested with v0.19.1. Download the binary for your file system from
+We have tested with rtsp-simpler-server v0.19.1. Download the binary for your file system from
 https://github.com/aler9/rtsp-simple-server/releases/tag/v0.19.1
 
 Run the server using `./rtsp-simple-server rtsp-simple-server.yml`
 
-Compile and run the server example. 
+Compile and run example-rtsp-server to publish video to the rtsp server. 
+
+Compile and run example-rtsp-client to connect to the rtsp server and view the video feed.
 
 Comment out `#define OFX_FFMPEG_RTSP_FROM_SOURCE` in ofxFFmpegRTSPUtils.h to load ffmpeg from system level.
 
