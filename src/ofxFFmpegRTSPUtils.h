@@ -10,6 +10,8 @@
 // comment this out to load ffmpeg from system level 
 #define OFX_FFMPEG_RTSP_FROM_SOURCE
 
+#define OFX_FFMPEG_RTSP_INCLUDED
+
 extern "C"
 {
 #if defined(OFX_FFMPEG_RTSP_FROM_SOURCE) && !defined(TARGET_LINUX)
