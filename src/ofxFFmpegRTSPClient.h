@@ -10,6 +10,9 @@
 
 #pragma once
 #include "ofxFFmpegRTSPUtils.h"
+#ifndef TARGET_OPENGLES
+#include "ofxFFmpegPbo.h"
+#endif
 
 extern "C"
 {
@@ -54,11 +57,13 @@ public:
     void update();
     bool isFrameNew() { return bNewFrame; }
     
-    const ofPixels& getPixels() const { return mPixels; }
-    ofPixels& getPixels() { return mPixels; }
+    const ofPixels& getPixels() const { return rPixels; }
+    ofPixels& getPixels() { return rPixels; }
     ofTexture& getTexture() { return mTexture; }
     void setTextureTarget( int aTexTarget );
     int getTextureTarget() { return mTextureTarget;}
+    void setUseTexture( bool ab ) { mBUseTexture=ab;}
+    bool isUsingTextue() {return mBUseTexture;}
     
     float getTimeDisconnected() { return mTimeSinceConnected;}
     float getTimeSinceLastFrame() { return mTimeSinceFrame;}
@@ -67,7 +72,9 @@ public:
     void clear();
     
     void threadedFunction() override;
-
+    
+    void setUsePbo(bool ab) { mBUsePbo = ab; }
+    bool isUsingPbo();
     double getIncomingFps() { return mFps.getFps(); }
     
 protected:
@@ -93,15 +100,17 @@ protected:
     bool bInited = false;
     
     bool mBNewPix = false;
+    bool mBUsePbo = true;
     
     int mWidth = 0;
     int mHeight = 0;
     
     //VideoFrameData mVFrameData;
-    ofPixels mVideoPixelsThread, mPixels;
+    ofPixels mVideoPixelsThread, mPixels, rPixels;
     
     ofTexture mTexture;
     int mTextureTarget = GL_TEXTURE_RECTANGLE_ARB;
+    bool mBUseTexture = true;
     
     bool bNewFrame = false;
     
@@ -116,4 +125,7 @@ protected:
     StreamSettings mStreamSettings;
 
     ofFpsCounter mFps;
+#ifndef TARGET_OPENGLES
+    shared_ptr<ofxFFmpegPbo> mPbo;
+#endif
 };

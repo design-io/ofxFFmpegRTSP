@@ -12,6 +12,10 @@ ofxFFmpegRTSPClient::ofxFFmpegRTSPClient() {
     mStreamSettings.options["rtsp_transport"] = "tcp";
     mStreamSettings.options["max_delay"] = "100";
     mStreamSettings.options["stimeout"] = "5000";
+    
+#ifdef TARGET_OPENGLES
+    mBUsePbo = false;
+#endif
 }
 
 //--------------------------------------------------------------
@@ -285,25 +289,55 @@ void ofxFFmpegRTSPClient::update() {
     if( lock() ) {
         if( mBNewPix ) {
             bNewFrame = true;
-            mBNewPix = false;
-
-            if (mWidth < 1 || mHeight < 1 || mWidth != mPixels.getWidth() || mHeight != mPixels.getHeight()) {
+            rPixels = mPixels;
+            if (mWidth < 1 || mHeight < 1 || mWidth != rPixels.getWidth() || mHeight != rPixels.getHeight() || !mBUseTexture) {
                 if (mTexture.isAllocated()) {
                     mTexture.clear();
                 }
+                #ifndef TARGET_OPENGLES
+                if( mPbo ) {
+                    mPbo.reset();
+                }
+                #endif
             } else {
                 if (mTexture.getWidth() != mWidth || mTexture.getHeight() != mHeight) {
-                    mTexture.allocate(mPixels, (mTextureTarget == GL_TEXTURE_RECTANGLE_ARB) );
+                    mTexture.allocate(rPixels, (mTextureTarget == GL_TEXTURE_RECTANGLE_ARB) );
+                    #ifndef TARGET_OPENGLES
+                    if( mPbo ) {
+                        mPbo.reset();
+                    }
+                    
+                    if( !mPbo && isUsingPbo() ) {
+                        mPbo = make_shared<ofxFFmpegPbo>();
+                        mPbo->allocate(mTexture, 3, true);
+                    }
+                    #endif
                 }
-                mTexture.loadData(mPixels);
+                
+                #ifndef TARGET_OPENGLES
+                if( mPbo ) {
+                    mPbo->loadData(rPixels);
+                } else {
+                    mTexture.loadData(rPixels);
+                }
+                #else
+                mTexture.loadData(rPixels);
+                #endif                
             }
 
             //cout << "ofxFFMpegRTSPClient :: update : mHeight: " << mHeight << " mTexture height: " << mTexture.getHeight() << " pix height: " << mPixels.getHeight() << " | " << ofGetFrameNum() << endl;
-
+            mBNewPix = false;
             mFps.newFrame();
         }
         unlock();
     }
+    
+#ifndef TARGET_OPENGLES
+    if( mPbo && mBUseTexture ) {
+        mPbo->updateTexture();
+    }
+#endif
+    
     if( bNewFrame ) {
         mTimeSinceFrame = 0;
     } else {
@@ -360,7 +394,7 @@ void ofxFFmpegRTSPClient::clear() {
 //--------------------------------------------------------------
 void ofxFFmpegRTSPClient::setTextureTarget( int aTexTarget ) {
     if( mTexture.isAllocated() ) {
-        if( mTexture.texData.textureTarget != aTexTarget ) {
+        if( mTexture.texData.textureTarget != aTexTarget || !mBUseTexture ) {
             mTexture.clear();
         }
     }
@@ -510,12 +544,12 @@ int ofxFFmpegRTSPClient::_decodePacket( AVCodecContext* adec, const AVPacket* ap
                 }
                 //ofLogNotice("ofxFFMpegRTSP :: received a new frame: | ") << ofGetFrameNum();
                 if( lock() ) {
-                    mBNewPix = true;
 //                    mPixels.copyFrom( mVideoPixelsThread );
                     if(mVideoPixelsThread.isAllocated()) {
                         mPixels.allocate(mVideoPixelsThread.getWidth(), mVideoPixelsThread.getHeight(), mVideoPixelsThread.getPixelFormat());
                         memcpy(mPixels.getData(), mVideoPixelsThread.getData(), mVideoPixelsThread.getTotalBytes());
                     }
+                    mBNewPix = true;
                     unlock();
                 }
             }
@@ -530,4 +564,13 @@ int ofxFFmpegRTSPClient::_decodePacket( AVCodecContext* adec, const AVPacket* ap
     }
     
     return 0;
+}
+
+//-----------------------------------------
+bool ofxFFmpegRTSPClient::isUsingPbo() {
+#ifdef TARGET_OPENGLES
+    mBUsePbo = false;
+#endif
+    
+    return mBUsePbo;
 }
