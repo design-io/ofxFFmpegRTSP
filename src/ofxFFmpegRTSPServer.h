@@ -92,6 +92,7 @@ public:
     void threadedFunction() override;
 
     bool isStreaming() { return bSetup && isThreadRunning(); }
+    int getNumConsecutiveErrors() { return mNumConsecutiveErrors;}
 
     //AVPixelFormat getAvPixelFormat(const ofPixels& apix);
     // implement these functions and reset if need be 
@@ -146,4 +147,5 @@ protected:
     //AVPixelFormat mStreamPixFormat = AV_PIX_FMT_YUV420P;
     AVPixelFormat mInputPixFormat = AV_PIX_FMT_RGB24;
     int mNumInputChannels = 3;
+    int mNumConsecutiveErrors = 0;
 };

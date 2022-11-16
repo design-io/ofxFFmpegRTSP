@@ -140,6 +140,12 @@ bool ofxFFmpegRTSPServer::init(string apath, int awidth, int aheight ) {
 bool ofxFFmpegRTSPServer::addFrame( const ofPixels& apix ) {
     if (apix.getWidth() > 0 && apix.getHeight() > 0) {
         if (apix.getWidth() != mWidth || apix.getHeight() != mHeight) {
+            if( lock() ) {
+                bSendFrame = false;
+                bReceivedPixels = false;
+                mVideoPixelsThread.clear();
+                unlock();
+            }
             ofLogError("ofxFFMpegRTSPServer :: addFrame : pixels are different size than width or height ");
             clear();
             return false;
@@ -210,12 +216,22 @@ void ofxFFmpegRTSPServer::threadedFunction() {
                     }
                     unlock();
                 }
+                int rval = 0;
                 if(bSendIt) {
-                    write_video_frame(pFormatCtx, video_st);
+                    rval = write_video_frame(pFormatCtx, video_st);
                 }
                 
                 if( bSendIt ) {
                     if( lock() ) {
+                        if( rval < 0 ) {
+                            mNumConsecutiveErrors++;
+                            if( mNumConsecutiveErrors > 99999 ) {
+                                mNumConsecutiveErrors = 99999;
+                            }
+                        } else {
+                            mNumConsecutiveErrors=0;
+                        }
+                        
                         bSendFrame = false;
                         unlock();
                     }

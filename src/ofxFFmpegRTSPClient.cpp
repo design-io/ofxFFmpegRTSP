@@ -29,7 +29,7 @@ bool ofxFFmpegRTSPClient::connect( string aAddress ) {
     
     mPath = aAddress;
     if( !bInited ) {
-        avformat_network_init();
+        //avformat_network_init();
     }
     bInited = true;
     
@@ -226,6 +226,22 @@ bool ofxFFmpegRTSPClient::connect( string aAddress ) {
         mOutPixFormat = AV_PIX_FMT_RGB24;
     } else if (pix_fmt == AV_PIX_FMT_ARGB) {
         mOutPixFormat = AV_PIX_FMT_RGBA;
+    }else{
+        ofLogError(__FUNCTION__) << "can't read format " << pix_fmt << " returning ";
+        clear();
+        return false; 
+    }
+
+    if( sws_isSupportedInput(pix_fmt) < 1 ) {
+        ofLogError(__FUNCTION__) << " sws does not support input format " << pix_fmt << " returning ";
+        clear();
+        return false; 
+    }
+
+    if(sws_isSupportedOutput(mOutPixFormat) < 1) {
+        ofLogError(__FUNCTION__) << " sws does not support output format " << mOutPixFormat << " returning ";
+        clear();
+        return false; 
     }
     
     // SWS_FAST_BILINEAR SWS_BICUBIC
@@ -263,6 +279,7 @@ bool ofxFFmpegRTSPClient::connect( string aAddress ) {
     if (!packet) {
         fprintf(stderr, "Could not allocate packet\n");
         int ret = AVERROR(ENOMEM);
+        clear();
         return false;
     }
     
@@ -359,6 +376,11 @@ void ofxFFmpegRTSPClient::clear() {
         waitForThread(true, 10000);
     }
     mBNewPix = false;
+
+    if( imgConvertCtx ) {
+        sws_freeContext(imgConvertCtx);
+        imgConvertCtx = nullptr;
+    }
     if( packet != nullptr ) {
         av_packet_free(&packet);
         packet = nullptr;
@@ -371,6 +393,9 @@ void ofxFFmpegRTSPClient::clear() {
     
     if( pCodecCtx != nullptr ) {
         avcodec_close(pCodecCtx);
+        if(pCodecCtx) {
+            delete pCodecCtx;
+        }
         pCodecCtx = nullptr;
     }
     
@@ -386,7 +411,7 @@ void ofxFFmpegRTSPClient::clear() {
     mBNewPix = false;
     
     if(bInited) {
-        avformat_network_deinit();
+        //avformat_network_deinit();
     }
     bInited = false;
 }
@@ -476,7 +501,8 @@ int ofxFFmpegRTSPClient::_decodePacket( AVCodecContext* adec, const AVPacket* ap
     while (ret >= 0) {
         if( !mBConnected ) {
             ret = -1;
-            break;
+            return ret;
+            //break;
         }
         
         ret = avcodec_receive_frame(adec, pFrame);
